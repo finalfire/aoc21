@@ -32,42 +32,10 @@ impl Board {
     }
 }
 
-fn part_1(to_draw: &Vec<u8>, boards: &mut Vec<Board>, max_draw: u32) -> u32 {
-    let mut winner = false;
-    let mut final_score = 0;
-
-    for d in to_draw {
-        for b in &mut *boards {
-            if b.hm[*d as usize] != EMPTY {
-                let i = b.hm[*d as usize].0 as usize;
-                let j = b.hm[*d as usize].1 as usize;
-
-                b.grid[i][j] = max_draw as u32 + 1;
-                b.rows[i] -= *d as u32;
-                b.cols[j] -= *d as u32;
-
-                if b.rows[i] == 0 || b.cols[j] == 0 {
-                    winner = true;
-                    let score: u32 = b.rows.iter().sum();
-                    final_score = *d as u32 * score;
-                    break;
-                }
-
-
-            }
-        }
-
-        if winner {
-            break;
-        }
-    }
-
-    final_score
-}
-
-fn part_2(to_draw: &Vec<u8>, boards: &mut Vec<Board>, max_draw: u32) -> u32 {
-    let mut final_score = 0;
+fn foo(to_draw: &Vec<u8>, boards: &mut Vec<Board>, max_draw: u32) -> (u32, u32) {
+    let (mut final_score_1, mut final_score_2) = (0, 0);
     let mut winners = vec![false; boards.len()];
+    let mut first = true;
 
     for d in to_draw {
         for b_i in 0..boards.len() {
@@ -85,14 +53,19 @@ fn part_2(to_draw: &Vec<u8>, boards: &mut Vec<Board>, max_draw: u32) -> u32 {
 
                 if boards[b_i].rows[i] == 0 || boards[b_i].cols[j] == 0 {
                     let score: u32 = boards[b_i].rows.iter().sum();
-                    final_score = *d as u32 * score;
+                    final_score_2 = *d as u32 * score;
                     winners[b_i] = true;
+
+                    if first {
+                        final_score_1 = final_score_2;
+                        first = false;
+                    }
                 }
             }
         }
     }
 
-    final_score
+    (final_score_1, final_score_2)
 }
 
 fn main() {
@@ -113,6 +86,6 @@ fn main() {
         boards.push(Board::new(&board_input, &max_draw));
     }
 
-    //println!("{}", part_1(&to_draw, &mut boards, *max_draw as u32));
-    //println!("{}", part_2(&to_draw, &mut boards, *max_draw as u32));
+    let (first_winner, last_winner) = foo(&to_draw, &mut boards, *max_draw as u32);
+    println!("{} {}", first_winner, last_winner);
 }
