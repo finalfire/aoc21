@@ -5,6 +5,8 @@ fn foo(lines: &Vec<Vec<u32>>, is_part_two: bool) -> usize {
     let mut h: HashMap<(u32, u32), u32> = HashMap::new();
     
     for v in lines {
+        // no need for the three ifs
+        // all three cases can be managed via x_off and y_off (e.g., x_off can be either 1, 0 or -1)
         if v[0] == v[2] {
             for j in v[1].min(v[3])..=v[1].max(v[3]) {
                 let value = h.entry((v[0], j)).or_insert(0);
